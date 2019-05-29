@@ -2,6 +2,7 @@ import React from 'react';
 import { Button, FlatList, ActivityIndicator, StyleSheet, Text, View, Linking } from 'react-native';
 import { createStackNavigator, createAppContainer } from "react-navigation";
 import Noticia from './Noticia';
+import ItemView from './app/ItemView'
 
 class HomeScreen extends React.Component {
   static navigationOptions = {
@@ -12,17 +13,12 @@ class HomeScreen extends React.Component {
     super(props);
     this.state = { isLoading: true, pagina: 0 }
 
-    this.anterior = this.anterior.bind(this);
     this.proxima = this.proxima.bind(this);
     this.carregar = this.carregar.bind(this);
   }
 
   proxima() {
     this.setState({ isLoading: true, pagina: this.state.pagina + 1 });
-  }
-
-  anterior() {
-    this.setState({ isLoading: true, pagina: this.state.pagina - 1 });
   }
 
   carregar() {
@@ -52,41 +48,21 @@ class HomeScreen extends React.Component {
   }
 
   render() {
-    if (this.state.isLoading) {
-      return (
-        <View style={{ flex: 1, padding: 20 }}>
-          <ActivityIndicator />
-        </View>
-      )
-    }
-
     return (
-      <View>
-        <View style={{ height: 510 }}>
+      <View style={{ backgroundColor: '#84ffff' }}>
+        <View>
           <FlatList
+            ref={(ref) => { this.flatListRef = ref; }}
+            onEndReached={() => {
+              this.flatListRef.scrollToOffset({ animated: true, offset: 0 });
+              this.proxima()
+            }}
             data={this.state.dataSource}
-            renderItem={({ item }) =>
-              <View style={{ borderWidth: 1, borderColor: 'black', borderStyle: "solid", margin: 10, padding: 5 }}>
-                <Text style={{ paddingTop: 5, fontSize: 20 }} onPress={() => {
-                  this.props.navigation.navigate('Noticia', item);
-                }}>
-                  {item.titulo}
-                </Text>
-              </View>}
-          />
-        </View>
-        <View style={{ flex: 1, flexDirection: "row", position: "absolute", bottom: 0 }}>
-          <View style={{ width: '30%', height: 1 }}>
-            <Button title="Anterior" onPress={this.anterior} />
-          </View>
-          <View style={{ width: '5%', height: 1 }}></View>
-          <View style={{ width: '30%', height: 1, alignItems: "center" }}>
-            <Text>Pagina {this.state.pagina + 1}</Text>
-          </View>
-          <View style={{ width: '5%', height: 1 }}></View>
-          <View style={{ width: "30%", height: 1 }}>
-            <Button title="próximo" onPress={this.proxima} />
-          </View>
+            renderItem={
+              ({ item }) =>
+                <ItemView item={item} onPress={() => this.props.navigation.navigate('Noticia', item)} />
+            } />
+          {this.state.isLoading ? <ActivityIndicator /> : <View />}
         </View>
       </View>
     );
