@@ -1,5 +1,12 @@
 import React from 'react';
-import { Button, FlatList, ActivityIndicator, StyleSheet, Text, View, Linking, Share } from 'react-native';
+import { TouchableHighlight, StyleSheet, Text, View, Linking, Share } from 'react-native';
+
+
+const styles = StyleSheet.create({
+  radioButtomText: { color: 'white', textAlign: "center", lineHeight: 50, fontSize: 20 },
+  radioButtom: { margin: 5, borderRadius: 100, width: 50, height: 50, backgroundColor: "blue" },
+  container: { flex: 1 }
+});
 
 export default class Noticia extends React.Component {
   static navigationOptions = {
@@ -43,20 +50,26 @@ export default class Noticia extends React.Component {
 
   render() {
     return (
-      <View>
+      <View style={styles.container}>
         <View style={{ padding: 10, margin: 15 }}>
           <Text style={{ textTransform: "capitalize", fontSize: 20 }}>{titulo}</Text>
           <Text style={{ textTransform: "capitalize", fontSize: 14 }}>{this.strip(resumo)}</Text>
+        </View>
 
-          <View style={{ marginTop: 10 }}>
-            <Button
-              title="Ver Noticia No Navegador"
-              onPress={this.btnAction} />
-          </View>
-          <View style={{ marginTop: 10 }}>
-            <Button
-              title="Publicar"
-              onPress={this.share} />
+        <View style={{ flex: 1, justifyContent: 'flex-end', marginBottom: 10, marginLeft: 10 }}>
+          <View style={{ flexDirection: 'row' }}>
+            <TouchableHighlight onPress={this.btnAction}>
+              <View style={styles.radioButtom}>
+                <Text
+                  style={styles.radioButtomText}>Full</Text>
+              </View>
+            </TouchableHighlight>
+            <TouchableHighlight onPress={this.share}>
+              <View style={styles.radioButtom}>
+                <Text
+                  style={styles.radioButtomText}>Share</Text>
+              </View>
+            </TouchableHighlight>
           </View>
         </View>
       </View>

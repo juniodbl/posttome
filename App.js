@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, FlatList, ActivityIndicator, StyleSheet, Text, View, Linking } from 'react-native';
 import { createStackNavigator, createAppContainer } from "react-navigation";
-import Noticia from './Noticia';
+import Noticia from './app/Noticia';
 import ItemView from './app/ItemView'
 
 class HomeScreen extends React.Component {
@@ -11,10 +11,11 @@ class HomeScreen extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { isLoading: true, pagina: 0 }
+    this.state = { isLoading: true, pagina: 0, dataSource: [] }
 
     this.proxima = this.proxima.bind(this);
     this.carregar = this.carregar.bind(this);
+    this.tratarDataSource = this.tratarDataSource.bind(this);
   }
 
   proxima() {
@@ -26,15 +27,30 @@ class HomeScreen extends React.Component {
       .then((response) => (response.json()))
       .then((responseJson) => {
         responseJson.forEach(item => item.key = item.id);
+
+        ;
+
         this.setState({
           pagina: this.state.pagina,
           isLoading: false,
-          dataSource: responseJson
+          dataSource: this.tratarDataSource(responseJson)
         }, () => { });
       })
       .catch((error) => {
         console.error(error);
       });
+  }
+
+  tratarDataSource(resp = []) {
+    resp.forEach((v, i) => {
+      var myRegexp = /<img src=['\"](.*?)['\"]/g;
+      var match = myRegexp.exec(v.resumo.replace('\r\n', ''));
+      if (match) {
+        v.imageTemplate = match[1];
+      }
+    });
+    
+    return this.state.dataSource.concat(resp);
   }
 
   componentDidUpdate() {
@@ -54,7 +70,6 @@ class HomeScreen extends React.Component {
           <FlatList
             ref={(ref) => { this.flatListRef = ref; }}
             onEndReached={() => {
-              this.flatListRef.scrollToOffset({ animated: true, offset: 0 });
               this.proxima()
             }}
             data={this.state.dataSource}
